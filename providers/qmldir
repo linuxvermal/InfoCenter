@@ -1,0 +1,7 @@
+module InfoCenter.Providers
+
+singleton AudioProvider 1.0 AudioProvider.qml
+singleton BatteryProvider 1.0 BatteryProvider.qml
+singleton NetworkProvider 1.0 NetworkProvider.qml
+singleton PowerProvider 1.0 PowerProvider.qml
+singleton SystemProvider 1.0 SystemProvider.qml

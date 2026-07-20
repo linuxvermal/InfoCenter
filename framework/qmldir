@@ -1,0 +1,4 @@
+module InfoCenter.Framework
+
+singleton Debugger 1.0 Debugger.qml
+singleton KeyboardNavigation 1.0 KeyboardNavigation.qml

@@ -1,0 +1,15 @@
+module InfoCenter.Components
+
+ActionButton 1.0 ActionButton.qml
+Divider 1.0 Divider.qml
+DualInfoRow 1.0 DualInfoRow.qml
+FocusRegion 1.0 FocusRegion.qml
+Header 1.0 Header.qml
+InfoRow 1.0 InfoRow.qml
+MiniStatMeter 1.0 MiniStatMeter.qml
+PasswordInput 1.0 PasswordInput.qml
+SectionTitle 1.0 SectionTitle.qml
+StatMeter 1.0 StatMeter.qml
+StatusBadge 1.0 StatusBadge.qml
+TemperatureRow 1.0 TemperatureRow.qml
+WifiNetworkRow 1.0 WifiNetworkRow.qml

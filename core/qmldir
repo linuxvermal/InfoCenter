@@ -1,0 +1,3 @@
+module InfoCenter.Core
+
+singleton SystemPaths 1.0 SystemPaths.qml
