@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../core"
 
 Singleton {
 
@@ -357,9 +358,14 @@ Singleton {
 
         command: [
 
-            "sh",
-            "-c",
-            "cat /sys/class/drm/card1/device/gpu_busy_percent"
+             "sh",
+             "-c",
+
+             `
+             if [ -n "${HardwarePaths.gpuBusy}" ]; then
+                cat "${HardwarePaths.gpuBusy}"
+             fi
+             `
 
         ]
 
@@ -391,9 +397,21 @@ Singleton {
 
             "sh",
             "-c",
-            "echo CPU $(cat /sys/class/hwmon/hwmon2/temp1_input); echo GPU $(cat /sys/class/hwmon/hwmon1/temp1_input); echo SSD $(cat /sys/class/hwmon/hwmon0/temp1_input)"
+            `
+        if [ -n "${HardwarePaths.cpuTemp}" ]; then
+            echo CPU $(cat "${HardwarePaths.cpuTemp}")
+        fi
 
+        if [ -n "${HardwarePaths.gpuTemp}" ]; then
+            echo GPU $(cat "${HardwarePaths.gpuTemp}")
+        fi
+
+        if [ -n "${HardwarePaths.ssdTemp}" ]; then
+            echo SSD $(cat "${HardwarePaths.ssdTemp}")
+        fi
+            `
         ]
+
 
         stdout: StdioCollector {
 
@@ -447,19 +465,24 @@ Singleton {
 
     }
 
-
     function updateGpu() {
+
+        if (!HardwarePaths.ready)
+            return
 
         if (!gpuProcess.running)
             gpuProcess.running = true
 
     }
 
-
     function updateTemperatures() {
+
+        if (!HardwarePaths.ready)
+            return
 
         if (!tempProcess.running)
             tempProcess.running = true
 
     }
+
 }

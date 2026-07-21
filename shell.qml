@@ -2,7 +2,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-import "InfoCenter"
+import "core"
+import "."
 
 ShellRoot {
     id: shell
