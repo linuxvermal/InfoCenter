@@ -12,7 +12,7 @@ import "theme"
 PanelWindow {
 
     id: root
-
+    
     focusable: true
 
     exclusionMode: ExclusionMode.Ignore
