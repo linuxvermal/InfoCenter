@@ -230,27 +230,6 @@ Column {
 
     }
 
-        NetworkConnectivity {
-
-                id: connectivity
-
-                visible: root.showNetworks
-
-                width: parent.width
-
-        onCancelRequested: {
-
-                      root.showNetworks = false
-
-        }
-
-        onConnectionSucceeded: {
-
-                     root.showNetworks = false
-
-        }
-
-    }
 
     //
     // Ethernet
@@ -396,6 +375,13 @@ Column {
 
         spacing: 6
 
+        onVisibleChanged: {
+
+             if (visible)
+                NetworkProvider.scan()
+
+        }
+
 
         GridLayout {
 
@@ -534,6 +520,37 @@ Column {
                 Layout.column: 1
             }
 
+        }
+
+        Item {
+            height: 8
+        }
+
+        Rectangle {
+            width: parent.width
+            height: 1
+            color: Theme.separator
+        }
+
+        Item {
+            height: 8
+        }
+
+    }
+
+    NetworkConnectivity {
+
+        visible: root.showNetworks || NetworkProvider.connectionType === "Offline"
+
+        width: parent.width
+
+        onCancelRequested: {
+            root.showNetworks = false
+        }
+
+        onConnectionSucceeded: {
+            root.showNetworks = false
+            NetworkProvider.refresh()
         }
 
     }

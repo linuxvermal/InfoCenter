@@ -215,7 +215,7 @@ Column {
                 //
                 // Default to the first (connected) network.
                 //
-                connectivity.selectedIndex = 0
+                root.selectedIndex = 0
 
                 NetworkProvider.scan()
 

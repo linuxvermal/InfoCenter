@@ -1,5 +1,10 @@
 # InfoCenter
 
+<img width="395" height="1198" alt="image" src="https://github.com/user-attachments/assets/450fec56-74f0-49f7-93dc-1c36051b286e" />
+<img width="395" height="1200" alt="image" src="https://github.com/user-attachments/assets/45cffcd6-ce0c-49d5-9fc7-4d58f12035f9" />
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/7b560d5b-ec85-4df5-a671-3a2778eebe06" />
+
+
 ## Overview
 
 InfoCenter is a modular system information panel built with
