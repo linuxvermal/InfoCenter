@@ -60,6 +60,10 @@ PanelWindow {
 
 
 
+            ModesSection { }
+
+
+
             SystemSection {
 
                 width: parent.width

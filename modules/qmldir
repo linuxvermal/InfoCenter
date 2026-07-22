@@ -2,6 +2,7 @@ module InfoCenter.Modules
 
 AudioSection 1.0 AudioSection.qml
 BatterySection 1.0 BatterySection.qml
+ModesSection 1.0 ModesSection.qml
 NetworkSection 1.0 NetworkSection.qml
 NetworkConnectivity 1.0 NetworkConnectivity.qml
 SystemSection 1.0 SystemSection.qml
