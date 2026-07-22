@@ -8,11 +8,10 @@ import "modules"
 import "providers"
 import "theme"
 
-
 PanelWindow {
 
     id: root
-    
+
     focusable: true
 
     exclusionMode: ExclusionMode.Ignore
@@ -26,11 +25,9 @@ PanelWindow {
     }
 
     anchors {
-
         top: true
         right: true
         bottom: true
-
     }
 
     implicitWidth: Theme.panelWidth
@@ -39,63 +36,67 @@ PanelWindow {
 
         anchors.fill: parent
 
-
         color: Qt.rgba(0.07, 0.07, 0.11, 0.82)
 
+        Flickable {
 
-
-        Column {
+            id: flick
 
             anchors.fill: parent
 
+            clip: true
 
-            anchors.margins: 16
+            contentWidth: width
+            contentHeight: contentColumn.height + 32
 
+            boundsBehavior: Flickable.StopAtBounds
 
-            spacing: 14
-
-
-
-            Header { }
-
-
-
-            ModesSection { }
-
-
-
-            SystemSection {
-
-                width: parent.width
-
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
             }
 
+            Column {
 
+                id: contentColumn
 
-            BatterySection {
+                width: flick.width - 32
 
-                width: parent.width
+                anchors.horizontalCenter: parent.horizontalCenter
 
+                anchors.top: parent.top
+                anchors.topMargin: 16
+
+                spacing: 14
+
+                Header { }
+
+                ModesSection { }
+
+                SystemSection {
+                    width: parent.width
+                }
+
+                BatterySection {
+                    width: parent.width
+                }
+
+                AudioSection {
+                    width: parent.width
+                }
+
+                NetworkSection {
+                    width: parent.width
+                }
+
+                NotificationSection {
+                    width: parent.width
+                }
+
+                Item {
+                    width: 1
+                    height: 16
+                }
             }
-
-
-
-            AudioSection {
-
-                width: parent.width
-
-            }
-
-
-
-            NetworkSection {
-
-                width: parent.width
-
-            }
-
         }
-
     }
-
 }

@@ -1,4 +1,5 @@
 module InfoCenter.Core
 
 singleton HardwarePaths 1.0 HardwarePaths.qml
+singleton NotificationServer 1.0 NotificationServer.qml
 singleton SystemPaths 1.0 SystemPaths.qml

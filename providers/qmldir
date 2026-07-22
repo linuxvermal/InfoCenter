@@ -4,5 +4,6 @@ singleton AudioProvider 1.0 AudioProvider.qml
 singleton BatteryProvider 1.0 BatteryProvider.qml
 singleton ModesProvider 1.0 ModesProvider.qml
 singleton NetworkProvider 1.0 NetworkProvider.qml
+singleton NotificationProvider 1.0 NotificationProvider.qml
 singleton PowerProvider 1.0 PowerProvider.qml
 singleton SystemProvider 1.0 SystemProvider.qml

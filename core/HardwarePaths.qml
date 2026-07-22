@@ -121,11 +121,11 @@ Singleton {
 
                 }
 
-                console.log("HardwarePaths:")
-                console.log("  CPU:", hardwarePaths.cpuTemp)
-                console.log("  GPU:", hardwarePaths.gpuTemp)
-                console.log("  SSD:", hardwarePaths.ssdTemp)
-                console.log("  GPU Busy:", hardwarePaths.gpuBusy)
+                //console.log("HardwarePaths:")
+                //console.log("  CPU:", hardwarePaths.cpuTemp)
+                //console.log("  GPU:", hardwarePaths.gpuTemp)
+                //console.log("  SSD:", hardwarePaths.ssdTemp)
+                //console.log("  GPU Busy:", hardwarePaths.gpuBusy)
 
                 hardwarePaths.ready = true
 

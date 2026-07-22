@@ -29,6 +29,9 @@ QtObject {
     property color bar:
         "#e8e6d9"
 
+    property color notificationcount:
+        "#c8a2c8"
+
     //
     // Dividers
     //
@@ -101,7 +104,7 @@ QtObject {
     //
 
     property int panelWidth:
-        396
+        408 
 
     property int headerHeight:
         54
