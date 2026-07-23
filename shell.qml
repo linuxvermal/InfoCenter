@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 
 import "core"
+import "components"
 import "."
 
 ShellRoot {
@@ -16,6 +17,9 @@ ShellRoot {
 
     InfoCenter {
         visible: shell.infoCenterVisible
+    }
+
+    PopupOverlay {
     }
 
     IpcHandler {

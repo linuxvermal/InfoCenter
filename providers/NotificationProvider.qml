@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 
 import "../core"
+import "../providers"
 
 Singleton {
 
@@ -99,6 +100,8 @@ Singleton {
 
         const updated = notifications.slice()
 
+        let popupNotification
+
         const existing = updated.find(function(item) {
 
             return notificationKey(item) === key
@@ -111,7 +114,7 @@ Singleton {
 
             updated.splice(index, 1)
 
-            updated.unshift({
+            popupNotification = {
 
                 id: notification.id,
                 appName: existing.appName,
@@ -121,11 +124,15 @@ Singleton {
                 timestamp: notification.timestamp,
                 count: (existing.count || 1) + 1
 
-            })
+            }
+
+            updated.unshift(popupNotification)
 
         } else {
 
             notification.count = 1
+
+            popupNotification = notification
 
             updated.unshift(notification)
 
@@ -137,6 +144,8 @@ Singleton {
             updated.length = maxNotifications
 
         notifications = updated
+
+        PopupManager.show(popupNotification)
     }
 
     function removeNotification(id) {

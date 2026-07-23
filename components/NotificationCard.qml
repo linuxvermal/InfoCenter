@@ -8,6 +8,8 @@ Rectangle {
 
     id: root
 
+    property bool popupMode: false
+
     //----------------------------------------------------------------------
     // Input
     //----------------------------------------------------------------------
@@ -66,16 +68,22 @@ Rectangle {
     }
 
     //----------------------------------------------------------------------
-    // Appearance
+    // Geometry
     //----------------------------------------------------------------------
 
-    width: parent ? parent.width : 0
+    implicitWidth: Theme.panelWidth - (Theme.spacing * 2)
 
     implicitHeight:
         layout.implicitHeight +
-        Theme.spacing * 2
+        (Theme.spacing * 2)
 
-    color: "transparent"
+    //----------------------------------------------------------------------
+    // Appearance
+    //----------------------------------------------------------------------
+
+    color: popupMode
+       ? Qt.rgba(0.10, 0.09, 0.08, 0.82)
+       : Theme.background
 
     radius: Theme.radius
 
@@ -148,6 +156,7 @@ Rectangle {
             }
 
             Item {
+
                 width: Theme.spacingSmall
                 height: 1
             }
