@@ -8,16 +8,26 @@ Singleton {
     id: provider
 
     //----------------------------------------------------------------------
-    // Active popup notifications
+    // Configuration
+    //----------------------------------------------------------------------
+
+    property int maxVisible: 4
+
+    property bool peaceMode: false
+
+    //----------------------------------------------------------------------
+    // State
     //----------------------------------------------------------------------
 
     property var activeNotifications: []
 
+    property var pendingNotifications: []
+
     //----------------------------------------------------------------------
-    // Public API
+    // Private helpers
     //----------------------------------------------------------------------
 
-    function show(notification) {
+    function activateNotification(notification) {
 
         activeNotifications = activeNotifications.concat([{
             notification: notification,
@@ -26,18 +36,58 @@ Singleton {
 
     }
 
+    //----------------------------------------------------------------------
+    // Public API
+    //----------------------------------------------------------------------
+
+    function show(notification) {
+
+        // PEACE Mode suppresses desktop popups only.
+        // Notifications have already been stored by NotificationProvider.
+
+        if (peaceMode)
+            return
+
+        if (activeNotifications.length < maxVisible) {
+
+            activateNotification(notification)
+
+        } else {
+
+            pendingNotifications =
+                pendingNotifications.concat([notification])
+
+        }
+
+    }
+
     function dismiss(id) {
 
         activeNotifications =
             activeNotifications.filter(function(popup) {
+
                 return popup.notification.id !== id
+
             })
+
+        if (pendingNotifications.length > 0) {
+
+            const notification = pendingNotifications[0]
+
+            pendingNotifications =
+                pendingNotifications.slice(1)
+
+            activateNotification(notification)
+
+        }
 
     }
 
     function clear() {
 
         activeNotifications = []
+
+        pendingNotifications = []
 
     }
 
@@ -49,12 +99,15 @@ Singleton {
 
         const now = Date.now()
 
-        activeNotifications =
-            activeNotifications.filter(function(popup) {
+        activeNotifications.forEach(function(popup) {
 
-                return (now - popup.shownAt) < 5000
+            if ((now - popup.shownAt) >= 5000) {
 
-            })
+                dismiss(popup.notification.id)
+
+            }
+
+        })
 
     }
 

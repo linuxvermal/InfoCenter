@@ -16,6 +16,14 @@ Singleton {
     property bool nightEnabled: false
 
     //
+    // Keep PopupManager in sync
+    //
+
+    onPeaceEnabledChanged: {
+        PopupManager.peaceMode = peaceEnabled
+    }
+
+    //
     // Refresh
     //
 
