@@ -1,184 +1,148 @@
 # InfoCenter
 
-<img width="395" height="1198" alt="image" src="https://github.com/user-attachments/assets/450fec56-74f0-49f7-93dc-1c36051b286e" />
-<img width="395" height="1200" alt="image" src="https://github.com/user-attachments/assets/45cffcd6-ce0c-49d5-9fc7-4d58f12035f9" />
-<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/7b560d5b-ec85-4df5-a671-3a2778eebe06" />
+> A modular Information Center for **Quickshell** and **NixOS**,
+> designed around clear architectural boundaries, reusable components,
+> and a lightweight, persistent user experience.
 
+------------------------------------------------------------------------
 
 ## Overview
 
-InfoCenter is a modular system information panel built with
-**Quickshell** and **QML** for NixOS. It runs as a persistent background
-application and is shown or hidden through IPC, making it fast to open
-without restarting Quickshell.
+InfoCenter is a persistent Quickshell application that provides system
+information, notifications, and quick system controls.
 
-The project is organized into small, focused layers:
+Instead of creating and destroying windows, the application is started
+once and shown or hidden through IPC. This makes opening the panel
+effectively instantaneous.
 
--   **UI** displays information.
--   **Providers** gather system data.
--   **Core** discovers and stores shared system paths.
--   **Linux** exposes the underlying `/proc`, `/sys`, PipeWire, and
-    NetworkManager interfaces.
+The project is intentionally organized into small layers where every
+component has a single responsibility.
+
+## Features
+
+-   Persistent Quickshell application
+-   Modular QML architecture
+-   Keyboard-first workflow
+-   System monitoring
+-   Audio controls
+-   Battery monitoring
+-   Network information
+-   Power profile controls
+-   Notification Center
+-   Desktop popup notifications
+-   Duplicate notification grouping
+-   Popup queue
+-   PEACE Mode
 
 ## Architecture
 
-    Hyprland
+``` text
+Hyprland
+    │
+    ▼
+shell.qml
+    │
+    ▼
+InfoCenter.qml
+    │
+    ▼
+Modules
+    │
+    ▼
+Providers
+    │
+    ▼
+Core
+    │
+    ▼
+Linux
+```
+
+Each layer depends only on the layer beneath it.
+
+## Notification Architecture
+
+``` text
+NotificationServer
         │
         ▼
-    shell.qml
+NotificationProvider
         │
-        ▼
-    InfoCenter.qml
+        ├── NotificationSection
         │
-        ▼
-    Modules
-        │
-        ▼
-    Providers
-        │
-        ▼
-    HardwarePaths / SystemPaths
-        │
-        ▼
-    Linux
+        └── PopupManager
+                │
+                ▼
+          PopupOverlay
+                │
+                ▼
+        NotificationCard
+```
 
-### Startup
+### NotificationServer
 
-1.  Hyprland launches `shell.qml`.
-2.  `shell.qml` creates the persistent Quickshell application.
-3.  IPC (`toggle`, `show`, `hide`) controls the InfoCenter window.
-4.  The window is shown or hidden instantly because Quickshell never
-    restarts.
+Receives D-Bus notifications and emits normalized notification objects.
 
-## Project Structure
+### NotificationProvider
 
-    InfoCenter/
-    ├── shell.qml
-    ├── InfoCenter.qml
-    ├── components/
-    ├── core/
-    ├── framework/
-    ├── modules/
-    ├── providers/
-    └── theme/
+Owns notification history, grouping, sorting, counts, removal, and
+history.
 
-### shell.qml
+### PopupManager
 
-Application entry point.
+Owns popup presentation, queueing, timeout handling, duplicate popup
+updates, and PEACE Mode.
 
--   Creates the persistent application.
--   Owns the InfoCenter window.
--   Handles IPC.
+### PopupOverlay
 
-### InfoCenter.qml
+Creates popup windows for each monitor.
 
-Main panel window.
+### NotificationCard
 
--   Defines the overall layout.
--   Hosts each module.
+Reusable component for both popup and history presentation.
 
-### components/
+## Duplicate Notifications
 
-Reusable UI widgets.
+Notifications are grouped by a logical key (application, summary, body,
+urgency). Grouped notifications retain a stable logical ID so both
+history and popups update in place.
 
-Examples:
+## Popup Queue
 
--   Buttons
--   Headers
--   Meters
--   Info rows
--   Dividers
+-   Maximum visible popups: **4**
+-   Additional notifications are queued.
+-   Queued notifications start their timeout only after becoming
+    visible.
 
-These contain presentation only and should not read system data
-directly.
+## PEACE Mode
 
-### modules/
-
-Complete sections of the interface.
-
-Examples:
-
--   System
--   Audio
--   Battery
--   Network
-
-Modules assemble components and connect them to providers.
-
-### providers/
-
-Responsible for retrieving system information.
-
-Examples:
-
--   CPU usage
--   Memory
--   Battery
--   Audio
--   Network
-
-Providers know **how** to obtain data but not how to display it.
-
-### core/
-
-Shared services used throughout the project.
-
-**HardwarePaths.qml**
-
--   Discovers dynamic hardware paths.
--   CPU temperature
--   GPU temperature
--   SSD temperature
--   GPU utilization
-
-**SystemPaths.qml**
-
-Stores static Linux paths such as:
-
--   `/proc/stat`
--   `/proc/meminfo`
--   `/proc/uptime`
-
-### framework/
-
-Application infrastructure.
-
-Examples:
-
--   Keyboard navigation
--   Debugging helpers
-
-### theme/
-
-Centralized colors, fonts, spacing, and sizing.
+PEACE Mode suppresses desktop popups while continuing to store every
+notification in history.
 
 ## Design Principles
 
-The project follows a layered architecture:
+-   One responsibility per component
+-   Providers own data
+-   UI owns presentation
+-   Popup lifetime is independent of notification history
+-   Keep features simple and maintainable
 
-    UI
-     │
-    Providers
-     │
-    Core
-     │
-    Linux
+## Development Workflow
 
-Guidelines:
-
--   Components should not collect data.
--   Modules should not discover hardware paths.
--   Providers should not contain UI.
--   Core should only expose shared services and paths.
--   Each layer depends only on the layer beneath it.
+1.  One feature
+2.  One file (or tightly related change)
+3.  Test
+4.  Freeze
+5.  Continue
 
 ## Future
 
-The architecture is intended to grow without major restructuring. Future
-additions may include:
-
--   Notification Center
 -   Fan monitoring
 -   CPU frequency monitoring
 -   Disk health
--   Additional hardware discovery
+-   Additional hardware sensors
+-   Expanded power management
+
+## License
+
+Add your preferred license here.
