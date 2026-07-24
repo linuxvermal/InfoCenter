@@ -116,12 +116,17 @@ Singleton {
 
             popupNotification = {
 
-                id: notification.id,
+                // Preserve the logical notification ID so PopupManager
+                // recognizes this as an update instead of a new popup.
+                id: existing.id,
+
                 appName: existing.appName,
                 summary: existing.summary,
                 body: existing.body,
                 urgency: existing.urgency,
+
                 timestamp: notification.timestamp,
+
                 count: (existing.count || 1) + 1
 
             }
@@ -146,6 +151,7 @@ Singleton {
         notifications = updated
 
         PopupManager.show(popupNotification)
+
     }
 
     function removeNotification(id) {
@@ -155,10 +161,13 @@ Singleton {
             return item.id !== id
 
         })
+
     }
 
     function clear() {
 
         notifications = []
+
     }
+
 }

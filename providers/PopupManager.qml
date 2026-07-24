@@ -29,9 +29,34 @@ Singleton {
 
     function activateNotification(notification) {
 
+        const existing = activeNotifications.findIndex(function(popup) {
+
+            return popup.notification.id === notification.id
+
+        })
+
+        if (existing >= 0) {
+
+            const updated = activeNotifications.slice()
+
+            updated[existing] = {
+
+                notification: notification,
+                shownAt: activeNotifications[existing].shownAt
+
+            }
+
+            activeNotifications = updated
+
+            return
+
+        }
+
         activeNotifications = activeNotifications.concat([{
+
             notification: notification,
             shownAt: Date.now()
+
         }])
 
     }
