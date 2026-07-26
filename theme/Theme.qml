@@ -104,7 +104,7 @@ QtObject {
     //
 
     property int panelWidth:
-        408 
+        408
 
     property int headerHeight:
         54

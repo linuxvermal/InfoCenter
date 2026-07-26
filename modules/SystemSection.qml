@@ -91,8 +91,8 @@ Column {
         rowSpacing: 6
 
         property int labelWidth: 34
-        property int valueWidth: 118
-        property int spacerWidth: 20
+        property int valueWidth: 140
+        property int spacerWidth: 12
 
         // USER
 

@@ -203,7 +203,7 @@ Singleton {
         command: [
               "sh",
               "-c",
-              "awk -F: '/model name/ {print $2; exit}' /proc/cpuinfo | sed 's/^ *//' | sed 's/AMD //' | sed 's/ w\\/.*//'"
+              "awk -F: '/model name/ {print $2; exit}' /proc/cpuinfo | sed 's/^ *//' | sed 's/(R)//g' | sed 's/(TM)//g' | sed 's/ CPU//g' | sed 's/@.*//' | sed 's/  */ /g' | sed 's/ *$//' | sed 's/ w\\/.*//'"
         ]
 
         stdout: StdioCollector {
@@ -233,30 +233,36 @@ Singleton {
 
             onStreamFinished: {
 
-    let gpu = this.text.trim()
+                let gpu = this.text.trim()
 
-    // AMD
-    if (gpu.includes("860M"))
-        provider.gpuModel = "Radeon 860M"
-    else if (gpu.includes("840M"))
-        provider.gpuModel = "Radeon 840M"
+                let nvidia = gpu.match(/\[(GeForce[^\]]+)\]/)
+                if (nvidia) {
+                    provider.gpuModel = "NVIDIA " + nvidia[1].replace("GeForce ", "")
+                    return
+                }
 
-    // NVIDIA
-    else if (gpu.includes("RTX")) {
-        let m = gpu.match(/RTX\s+[0-9]{3,4}/)
-        provider.gpuModel = m ? m[0] : "RTX"
-    }
+                let amd = gpu.match(/Radeon[^,\]]+/i)
+                if (amd) {
+                    provider.gpuModel = amd[0].trim()
+                    return
+                }
 
-    // Intel Arc
-    else if (gpu.includes("Arc")) {
-        let m = gpu.match(/Arc\s+[A-Za-z0-9]+/)
-        provider.gpuModel = m ? m[0] : "Intel Arc"
-    }
+                let arc = gpu.match(/Arc\s+[A-Za-z0-9\- ]+/i)
+                if (arc) {
+                    provider.gpuModel = "Intel " + arc[0].trim()
+                    return
+                }
 
-    else
-        provider.gpuModel = "Unknown"
+                let intel = gpu.match(/(UHD|Iris)[^,\]]+/i)
+                if (intel) {
+                    provider.gpuModel = "Intel " + intel[0].trim()
+                    return
+                }
 
-    }
+                gpu = gpu.replace(/^.*?:\s*/, "").replace(/\(rev.*$/, "").trim()
+                provider.gpuModel = gpu.length ? gpu : "Unknown"
+
+            }
 
     }
 
