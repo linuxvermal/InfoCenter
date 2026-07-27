@@ -15,9 +15,20 @@ Column {
 
     property bool showNetworks: false
 
+    readonly property var activeInterfaces: NetworkProvider.interfaces.filter(function(i){ return i.connected })
+    readonly property var activeWifi: activeInterfaces.filter(function(i){ return i.type==="wifi" })
+    readonly property var activeEthernet: activeInterfaces.filter(function(i){ return i.type==="ethernet" })
+    readonly property int activeCount: activeInterfaces.length
+
+    readonly property var wifi:
+    activeWifi.length > 0 ? activeWifi[0] : null
+
+    readonly property var ethernet:
+    activeEthernet.length > 0 ? activeEthernet[0] : null
+
     SectionTitle {
 
-        title: "NETWORK"
+        title: "NETWORK (" + root.activeCount + ")"
 
     }
 
@@ -27,7 +38,7 @@ Column {
 
     Column {
 
-        visible: NetworkProvider.connectionType === "WiFi" && !root.showNetworks
+        visible: root.activeWifi.length > 0 && !root.showNetworks
 
         width: parent.width
 
@@ -72,7 +83,7 @@ Column {
 
                 Layout.preferredWidth: wifiGrid.valueWidth
 
-                text: NetworkProvider.ssid
+                text: wifi ? wifi.ssid : "--"
 
                 color: Theme.noncritical
 
@@ -110,7 +121,7 @@ Column {
 
                 Layout.preferredWidth: wifiGrid.valueWidth
 
-                text: NetworkProvider.signal + "%"
+                text: wifi ? wifi.signal + "%" : "--"
 
                 color: Theme.text
 
@@ -146,7 +157,7 @@ Column {
 
                 Layout.preferredWidth: wifiGrid.valueWidth
 
-                text: NetworkProvider.ip
+                text: wifi ? wifi.ip : "--"
 
                 color: Theme.text
 
@@ -176,7 +187,7 @@ Column {
                 Layout.row: 0
                 Layout.column: 3
 
-                text: "WiFi"
+                text: "WiFi (1)"
 
                 color: Theme.warning
 
@@ -237,7 +248,7 @@ Column {
 
     Column {
 
-        visible: NetworkProvider.connectionType === "Ethernet" && !root.showNetworks
+        visible: root.activeEthernet.length > 0 && !root.showNetworks
 
         width: parent.width
 
@@ -282,7 +293,7 @@ Column {
 
                 Layout.preferredWidth: ethernetGrid.valueWidth
 
-                text: NetworkProvider.ethernetSpeed
+                text: ethernet ? ethernet.speed : "--"
 
                 color: Theme.text
 
@@ -318,7 +329,7 @@ Column {
 
                 Layout.preferredWidth: ethernetGrid.valueWidth
 
-                text: NetworkProvider.ip
+                text: ethernet ? ethernet.ip : "--"
 
                 color: Theme.text
 
@@ -347,7 +358,7 @@ Column {
                 Layout.row: 0
                 Layout.column: 3
 
-                text: "Ethernet"
+                text: "Ethernet (" + root.activeEthernet.length + ")"
 
                 color: Theme.warning
 
@@ -369,7 +380,7 @@ Column {
 
     Column {
 
-        visible: NetworkProvider.connectionType === "Offline" && !root.showNetworks
+        visible: root.activeCount === 0 && !root.showNetworks
 
         width: parent.width
 
@@ -540,7 +551,7 @@ Column {
 
     NetworkConnectivity {
 
-        visible: root.showNetworks || NetworkProvider.connectionType === "Offline"
+        visible: root.showNetworks || root.activeCount === 0
 
         width: parent.width
 

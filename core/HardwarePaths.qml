@@ -46,45 +46,48 @@ Singleton {
 
             find_sensor() {
 
-                driver="$1"
+                for wanted in "$@"; do
 
-              for d in /sys/class/hwmon/hwmon*; do
+                    for d in /sys/class/hwmon/hwmon*; do
 
-                [ -f "$d/name" ] || continue
+                        [ -f "$d/name" ] || continue
 
-              if [ "$(cat "$d/name")" = "$driver" ]; then
+                        if [ "$(cat "$d/name")" = "$wanted" ]; then
 
-              if [ -f "$d/temp1_input" ]; then
-                echo "$d/temp1_input"
-                return
-              fi
+                            if [ -f "$d/temp1_input" ]; then
+                                echo "$d/temp1_input"
+                                return
+                            fi
 
-            fi
+                        fi
 
-        done
+                    done
 
-        }
+                done
+
+            }
 
             find_gpu_busy() {
 
-              for d in /sys/class/drm/card*/device; do
+                for d in /sys/class/drm/card*/device; do
 
-              [ -f "$d/gpu_busy_percent" ] || continue
+                    [ -f "$d/gpu_busy_percent" ] || continue
 
-            echo "$d/gpu_busy_percent"
-              return
+                    echo "$d/gpu_busy_percent"
+                    return
 
-        done
+                done
 
-        }
+            }
 
-            echo CPU=$(find_sensor k10temp)
-            echo GPU=$(find_sensor amdgpu)
+            echo CPU=$(find_sensor k10temp coretemp zenpower)
+            echo GPU=$(find_sensor amdgpu nvidia nouveau)
             echo SSD=$(find_sensor nvme)
             echo GPUBUSY=$(find_gpu_busy)
-        `
 
-    ]
+            `
+
+        ]
 
         stdout: StdioCollector {
 
@@ -121,11 +124,13 @@ Singleton {
 
                 }
 
-                //console.log("HardwarePaths:")
-                //console.log("  CPU:", hardwarePaths.cpuTemp)
-                //console.log("  GPU:", hardwarePaths.gpuTemp)
-                //console.log("  SSD:", hardwarePaths.ssdTemp)
-                //console.log("  GPU Busy:", hardwarePaths.gpuBusy)
+                // Uncomment for debugging if needed.
+                //
+                // console.log("HardwarePaths:")
+                // console.log("  CPU:", hardwarePaths.cpuTemp)
+                // console.log("  GPU:", hardwarePaths.gpuTemp)
+                // console.log("  SSD:", hardwarePaths.ssdTemp)
+                // console.log("  GPU Busy:", hardwarePaths.gpuBusy)
 
                 hardwarePaths.ready = true
 

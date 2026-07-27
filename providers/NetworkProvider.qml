@@ -13,10 +13,16 @@ Singleton {
     property string ip: "--"
     property string ethernetSpeed: "--"
 
+
     property string wifiInterface: ""
     property string ethernetInterface: ""
 
+    // Internal interface inventory (Commit 1)
+    property var interfaceInventory: []
+    property var interfaces: []
+
     property var availableNetworks: []
+
     property bool scanning: false
 
     signal connectionSucceeded()
@@ -54,68 +60,104 @@ Singleton {
         signal = 0
         ip = "--"
         ethernetSpeed = "--"
+
         wifiInterface = ""
         ethernetInterface = ""
+
+    // Reset interface inventory
+        interfaceInventory = []
+        interfaces = []
     }
 
+    function createInterface(data){
+        data = data || {}
+        return {
+            type: data.type || "",
+            name: data.name || "",
+            connected: !!data.connected,
+            connection: data.connection || "",
+            ssid: data.ssid !== undefined ? data.ssid : "--",
+            signal: data.signal !== undefined ? data.signal : 0,
+            speed: data.speed !== undefined ? data.speed : "--",
+            ip: data.ip !== undefined ? data.ip : "--"
+        }
+    }
+
+
+function rebuildInterfaces() {
+
+        let snapshot = []
+        for (let iface of interfaceInventory) {
+
+            snapshot.push(createInterface({
+                type: iface.type,
+                name: iface.name,
+                connected: iface.connected,
+                connection: iface.connection,
+                ssid: (iface.connected && iface.type==="wifi") ? ssid : "--",
+                signal: (iface.connected && iface.type==="wifi") ? signal : 0,
+                speed: (iface.connected && iface.type==="ethernet") ? ethernetSpeed : "--",
+                ip: iface.connected ? ip : "--"
+            }))
+        }
+
+        interfaces = snapshot
+
+    }
+
+    
     function parseRefresh(text) {
 
         resetState()
 
         let lines = text.trim().split("\n")
+        let inventory = []
 
         for (let line of lines) {
-            if (line.length === 0)
-                continue
+            if (!line.length) continue
+            let p=line.split(":")
+            if (p.length<4) continue
+            let dev=p[0], type=p[1], state=p[2], conn=p[3]
+            let connected=(state==="connected")
+            inventory.push({
+                name:dev,
+                type:type,
+                connected:connected,
+                connection:conn
+            })
 
-            let p = line.split(":")
 
-            if (p.length < 4)
-                continue
-
-            let dev = p[0]
-            let type = p[1]
-            let state = p[2]
-            let conn = p[3]
-
-            if (type === "wifi") {
-                wifiInterface = dev
-                if (state === "connected") {
-                    connectionType = "WiFi"
-                    ssid = conn
-                }
-            }
-
-            if (type === "ethernet") {
-                ethernetInterface = dev
-                if (state === "connected")
-                    connectionType = "Ethernet"
+            if(type==="wifi" && connected){
+                if(wifiInterface==="") wifiInterface=dev
+                connectionType="WiFi"
+                ssid=conn
+            } else if(type==="ethernet" && connected){
+                if(ethernetInterface==="") ethernetInterface=dev
+                connectionType="Ethernet"
             }
         }
 
-            if (connectionType === "WiFi") {
-                wifiProcess.command = [
-                   "sh",
-                   "-c",
-                   "iw dev " + wifiInterface + " link; nmcli -g IP4.ADDRESS device show " + wifiInterface
-            ]
-
-                wifiProcess.running = true
-          } else if (connectionType === "Ethernet") {
-                ethernetProcess.command = [
-                  "sh","-c",
-                  "cat /sys/class/net/" + ethernetInterface + "/speed 2>/dev/null;nmcli -g IP4.ADDRESS device show " + ethernetInterface
-            ]
-                ethernetProcess.running = true
+        interfaceInventory = inventory
+        if (connectionType === "WiFi") {
+            wifiProcess.command=["sh","-c","iw dev "+wifiInterface+" link; nmcli -g IP4.ADDRESS device show "+wifiInterface]
+            wifiProcess.running=true
+        } else if (connectionType==="Ethernet") {
+            ethernetProcess.command=["sh","-c","cat /sys/class/net/"+ethernetInterface+"/speed 2>/dev/null; nmcli -g IP4.ADDRESS device show "+ethernetInterface]
+            ethernetProcess.running=true
+        } else {
+            rebuildInterfaces()
         }
     }
 
-    function parseWifi(text) {
+    function parseWifiData(text) {
+
+    let data = {
+        ssid: ssid,
+        signal: 0,
+        ip: "--"
+    }
 
     let lines = text.trim().split("\n")
-
-    signal = 0
-    ip = "--"
 
     for (let line of lines) {
 
@@ -123,7 +165,7 @@ Singleton {
 
         if (line.startsWith("SSID:")) {
 
-            ssid = line.substring(5).trim()
+            data.ssid = line.substring(5).trim()
 
         }
 
@@ -135,10 +177,7 @@ Singleton {
 
                 let dbm = parseInt(match[1])
 
-                //
-                // Convert dBm to an approximate percentage.
-                //
-                signal = Math.max(
+                data.signal = Math.max(
                     0,
                     Math.min(
                         100,
@@ -152,19 +191,42 @@ Singleton {
 
         else if (line.indexOf("/") !== -1) {
 
-            ip = line
+            data.ip = line
 
         }
 
     }
 
-  }
+    return data
+}
 
-    function parseEthernet(text) {
-        let lines = text.trim().split("\n")
-        ethernetSpeed = (lines.length > 0 && lines[0] !== "") ? lines[0] + " Mbps" : "--"
-        ip = (lines.length > 1 && lines[1] !== "") ? lines[1] : "--"
+function parseWifi(text) {
+
+    let data = parseWifiData(text)
+
+    ssid = data.ssid
+    signal = data.signal
+    ip = data.ip
+
+    rebuildInterfaces()
+
+}
+
+function parseEthernetData(text) {
+        let lines=text.trim().split("\n")
+        return {speed:(lines.length>0&&lines[0]!==""?lines[0]+" Mbps":"--"), ip:(lines.length>1&&lines[1]!==""?lines[1]:"--")}
     }
+
+function parseEthernet(text) {
+
+    let data = parseEthernetData(text)
+
+    ethernetSpeed = data.speed
+    ip = data.ip
+
+    rebuildInterfaces()
+
+}
 
     function parseScan(text) {
         let map = {}

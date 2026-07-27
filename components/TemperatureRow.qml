@@ -11,30 +11,49 @@ Item {
     ////////////////////////////////////////////////////////
 
     property string cpuTemp: "--"
-
     property string gpuTemp: "--"
-
     property string ssdTemp: "--"
 
-    property color cpuColor: Theme.noncritical
+    ////////////////////////////////////////////////////////
+    // Temperature Colors
+    ////////////////////////////////////////////////////////
 
-    property color gpuColor: Theme.noncritical
+    function temperatureColor(tempString, warning, critical) {
 
-    property color ssdColor: Theme.noncritical
+        let value = parseInt(tempString)
+
+        if (isNaN(value))
+            return Theme.noncritical
+
+        if (value >= critical)
+            return Theme.critical
+
+        if (value >= warning)
+            return Theme.warning
+
+        return Theme.noncritical
+
+    }
+
+    property color cpuColor:
+        temperatureColor(cpuTemp, 158, 185)
+
+    property color gpuColor:
+        temperatureColor(gpuTemp, 158, 181)
+
+    property color ssdColor:
+        temperatureColor(ssdTemp, 140, 158)
 
     ////////////////////////////////////////////////////////
 
     implicitWidth: parent ? parent.width : 396
-
     implicitHeight: 20
-
 
     RowLayout {
 
         anchors.fill: parent
 
         spacing: 0
-
 
         Text {
 
@@ -49,7 +68,6 @@ Item {
             font.pixelSize: Theme.normalSize
 
         }
-
 
         Text {
 
@@ -66,7 +84,6 @@ Item {
             font.pixelSize: Theme.normalSize
 
         }
-
 
         Text {
 

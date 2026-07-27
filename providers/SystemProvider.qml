@@ -43,9 +43,17 @@ Singleton {
     // Temperatures
     ////////////////////////////////////////////////////////
 
-    property string cpuTemp: "--"
-    property string gpuTemp: "--"
-    property string ssdTemp: "--"
+    property string cpuTemp: SensorProvider.hasCpuTemperature
+                             ? Math.round((SensorProvider.cpuTemperature * 9 / 5) + 32) + "°F"
+                             : "--"
+
+    property string gpuTemp: SensorProvider.hasGpuTemperature
+                             ? Math.round((SensorProvider.gpuTemperature * 9 / 5) + 32) + "°F"
+                             : "--"
+
+    property string ssdTemp: SensorProvider.hasNvmeTemperature
+                             ? Math.round((SensorProvider.nvmeTemperature * 9 / 5) + 32) + "°F"
+                             : "--"
 
     ////////////////////////////////////////////////////////
     // Startup
@@ -61,58 +69,40 @@ Singleton {
 
     Timer {
 
-    interval: 2000
+        interval: 2000
 
-    running: true
+        running: true
 
-    repeat: true
+        repeat: true
 
-    triggeredOnStart: true
+        triggeredOnStart: true
 
-    onTriggered: {
+        onTriggered: {
 
-        updateUsage()
-        updateGpu()
+            updateUsage()
+            updateGpu()
+
+        }
 
     }
-
-}
 
     Timer {
 
-    interval: 5000
+        interval: 60000
 
-    running: true
+        running: true
 
-    repeat: true
+        repeat: true
 
-    triggeredOnStart: true
+        triggeredOnStart: true
 
-    onTriggered: {
+        onTriggered: {
 
-        updateTemperatures()
+            updateRuntime()
 
-    }
-
-}
-
-    Timer {
-
-    interval: 60000
-
-    running: true
-
-    repeat: true
-
-    triggeredOnStart: true
-
-    onTriggered: {
-
-        updateRuntime()
+        }
 
     }
-
-}
 
     ////////////////////////////////////////////////////////
     // Startup Functions
@@ -149,7 +139,6 @@ Singleton {
 
     }
 
-
     ////////////////////////////////////////////////////////
     // Identity Processes
     ////////////////////////////////////////////////////////
@@ -172,7 +161,6 @@ Singleton {
 
     }
 
-
     Process {
 
         id: hostProcess
@@ -191,7 +179,6 @@ Singleton {
 
     }
 
-
     ////////////////////////////////////////////////////////
     // Hardware Processes
     ////////////////////////////////////////////////////////
@@ -201,9 +188,9 @@ Singleton {
         id: cpuModelProcess
 
         command: [
-              "sh",
-              "-c",
-              "awk -F: '/model name/ {print $2; exit}' /proc/cpuinfo | sed 's/^ *//' | sed 's/(R)//g' | sed 's/(TM)//g' | sed 's/ CPU//g' | sed 's/@.*//' | sed 's/  */ /g' | sed 's/ *$//' | sed 's/ w\\/.*//'"
+            "sh",
+            "-c",
+            "awk -F: '/model name/ {print $2; exit}' /proc/cpuinfo | sed 's/^ *//' | sed 's/(R)//g' | sed 's/(TM)//g' | sed 's/ CPU//g' | sed 's/@.*//' | sed 's/  */ /g' | sed 's/ *$//' | sed 's/ w\\/.*//'"
         ]
 
         stdout: StdioCollector {
@@ -218,15 +205,14 @@ Singleton {
 
     }
 
-
     Process {
 
         id: gpuModelProcess
 
         command: [
-             "sh",
-             "-c",
-             "lspci | grep -i 'vga\\|3d\\|display' | head -1"
+            "sh",
+            "-c",
+            "lspci | grep -i 'vga\\|3d\\|display' | head -1"
         ]
 
         stdout: StdioCollector {
@@ -241,9 +227,10 @@ Singleton {
                     return
                 }
 
-                let amd = gpu.match(/Radeon[^,\]]+/i)
+                let amd = gpu.match(/Radeon\s+([0-9]{3,4}M)(?:\s*\/\s*([0-9]{3,4}M))?/i)
+
                 if (amd) {
-                    provider.gpuModel = amd[0].trim()
+                    provider.gpuModel = "Radeon " + (amd[2] || amd[1])
                     return
                 }
 
@@ -264,10 +251,9 @@ Singleton {
 
             }
 
-    }
+        }
 
     }
-
 
     ////////////////////////////////////////////////////////
     // Runtime Processes
@@ -278,17 +264,15 @@ Singleton {
         id: kernelProcess
 
         command: [
-
             "uname",
             "-r"
-
         ]
 
         stdout: StdioCollector {
 
             onStreamFinished: {
 
-                provider.kernel = this.text.trim()
+                provider.kernel = this.text.trim().split("-")[0]
 
             }
 
@@ -296,17 +280,14 @@ Singleton {
 
     }
 
-
     Process {
 
         id: uptimeProcess
 
         command: [
-
             "sh",
             "-c",
             "awk '{days=int($1/86400); hours=int(($1%86400)/3600); mins=int(($1%3600)/60); printf \"%dd %dh %dm\", days, hours, mins}' /proc/uptime"
-
         ]
 
         stdout: StdioCollector {
@@ -321,7 +302,7 @@ Singleton {
 
     }
 
-     ////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////
     // Usage Processes
     ////////////////////////////////////////////////////////
 
@@ -330,11 +311,9 @@ Singleton {
         id: statsProcess
 
         command: [
-
             "sh",
             "-c",
             "top -bn1 | grep 'Cpu(s)' | awk '{print $2}'; free | grep Mem | awk '{print $3/$2 * 100}'; df / | tail -1 | awk '{print $5}' | tr -d '%'"
-
         ]
 
         stdout: StdioCollector {
@@ -357,22 +336,18 @@ Singleton {
 
     }
 
-
     Process {
 
         id: gpuProcess
 
         command: [
-
-             "sh",
-             "-c",
-
-             `
-             if [ -n "${HardwarePaths.gpuBusy}" ]; then
+            "sh",
+            "-c",
+            `
+            if [ -n "${HardwarePaths.gpuBusy}" ]; then
                 cat "${HardwarePaths.gpuBusy}"
-             fi
-             `
-
+            fi
+            `
         ]
 
         stdout: StdioCollector {
@@ -389,76 +364,6 @@ Singleton {
         }
 
     }
-
-
-    ////////////////////////////////////////////////////////
-    // Temperature Process
-    ////////////////////////////////////////////////////////
-
-    Process {
-
-        id: tempProcess
-
-        command: [
-
-            "sh",
-            "-c",
-            `
-        if [ -n "${HardwarePaths.cpuTemp}" ]; then
-            echo CPU $(cat "${HardwarePaths.cpuTemp}")
-        fi
-
-        if [ -n "${HardwarePaths.gpuTemp}" ]; then
-            echo GPU $(cat "${HardwarePaths.gpuTemp}")
-        fi
-
-        if [ -n "${HardwarePaths.ssdTemp}" ]; then
-            echo SSD $(cat "${HardwarePaths.ssdTemp}")
-        fi
-            `
-        ]
-
-
-        stdout: StdioCollector {
-
-            onStreamFinished: {
-
-                let lines = this.text.trim().split("\n")
-
-                for (let line of lines) {
-
-                    let parts = line.split(" ")
-
-                    if (parts.length !== 2)
-                        continue
-
-                    let c = parseFloat(parts[1]) / 1000
-                    let f = Math.round((c * 9 / 5) + 32) + "°F"
-
-                    switch (parts[0]) {
-
-                    case "CPU":
-                        provider.cpuTemp = f
-                        break
-
-                    case "GPU":
-                        provider.gpuTemp = f
-                        break
-
-                    case "SSD":
-                        provider.ssdTemp = f
-                        break
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }
-
 
     ////////////////////////////////////////////////////////
     // Update Implementations
@@ -478,16 +383,6 @@ Singleton {
 
         if (!gpuProcess.running)
             gpuProcess.running = true
-
-    }
-
-    function updateTemperatures() {
-
-        if (!HardwarePaths.ready)
-            return
-
-        if (!tempProcess.running)
-            tempProcess.running = true
 
     }
 

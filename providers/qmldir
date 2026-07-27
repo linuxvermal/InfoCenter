@@ -7,4 +7,5 @@ singleton NetworkProvider 1.0 NetworkProvider.qml
 singleton NotificationProvider 1.0 NotificationProvider.qml
 singleton PopupManager 1.0 PopupManager.qml
 singleton PowerProvider 1.0 PowerProvider.qml
+singleton SensorProvider 1.0 SensorProvider.qml
 singleton SystemProvider 1.0 SystemProvider.qml
