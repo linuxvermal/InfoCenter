@@ -4,7 +4,6 @@ AudioSection 1.0 AudioSection.qml
 BatterySection 1.0 BatterySection.qml
 ModesSection 1.0 ModesSection.qml
 NetworkSection 1.0 NetworkSection.qml
-NetworkInterfaceCard 1.0 NetworkInterfaceCard.qml
 NetworkConnectivity 1.0 NetworkConnectivity.qml
 NotificationSection 1.0 NotificationSection.qml
 SystemSection 1.0 SystemSection.qml
