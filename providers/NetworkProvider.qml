@@ -56,17 +56,10 @@ Singleton {
 
     function resetState() {
         connectionType = "Offline"
-        ssid = "--"
-        signal = 0
-        ip = "--"
-        ethernetSpeed = "--"
 
         wifiInterface = ""
         ethernetInterface = ""
 
-    // Reset interface inventory
-        interfaceInventory = []
-        interfaces = []
     }
 
     function createInterface(data){
@@ -145,8 +138,15 @@ function rebuildInterfaces() {
             ethernetProcess.command=["sh","-c","cat /sys/class/net/"+ethernetInterface+"/speed 2>/dev/null; nmcli -g IP4.ADDRESS device show "+ethernetInterface]
             ethernetProcess.running=true
         } else {
+
+            ssid = "--"
+            signal = 0
+            ip = "--"
+            ethernetSpeed = "--"
+
             rebuildInterfaces()
-        }
+
+        } 
     }
 
     function parseWifiData(text) {
