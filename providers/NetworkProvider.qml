@@ -10,10 +10,6 @@ Singleton {
     property string connectionType: "Offline"
     property string ssid: "--"
     property int signal: 0
-    property string ip: "--"
-    property string ethernetSpeed: "--"
-
-
     property string wifiInterface: ""
     property string ethernetInterface: ""
 
@@ -24,6 +20,9 @@ Singleton {
     property var availableNetworks: []
 
     property bool scanning: false
+    property var metadataQueue: []
+    property int metadataGeneration: 0
+    property var activeMetadataJob: null
 
     signal connectionSucceeded()
     signal connectionFailed()
@@ -78,84 +77,61 @@ Singleton {
 
 
 function rebuildInterfaces() {
+        let snapshot=[]
+        for (let iface of interfaceInventory)
+            snapshot.push(createInterface(iface))
+        interfaces=snapshot
+    }
 
-        let snapshot = []
-        for (let iface of interfaceInventory) {
-
-            snapshot.push(createInterface({
-                type: iface.type,
-                name: iface.name,
-                connected: iface.connected,
-                connection: iface.connection,
-                ssid: (iface.connected && iface.type==="wifi") ? ssid : "--",
-                signal: (iface.connected && iface.type==="wifi") ? signal : 0,
-                speed: (iface.connected && iface.type==="ethernet") ? ethernetSpeed : "--",
-                ip: iface.connected ? ip : "--"
-            }))
+    function runNextMetadataJob() {
+        if (metadataQueue.length===0) { activeMetadataJob=null; rebuildInterfaces(); return }
+        activeMetadataJob=metadataQueue.shift()
+        if (activeMetadataJob.type==="wifi") {
+            wifiProcess.command=["sh","-c","iw dev "+activeMetadataJob.iface.name+" link; nmcli -g IP4.ADDRESS device show "+activeMetadataJob.iface.name]
+            wifiProcess.running=true
+        } else {
+            ethernetProcess.command=["sh","-c","cat /sys/class/net/"+activeMetadataJob.iface.name+"/speed 2>/dev/null; nmcli -g IP4.ADDRESS device show "+activeMetadataJob.iface.name]
+            ethernetProcess.running=true
         }
-
-        interfaces = snapshot
-
     }
 
     
     function parseRefresh(text) {
 
         resetState()
+        metadataGeneration++
+        metadataQueue=[]
+        activeMetadataJob=null
 
-        let lines = text.trim().split("\n")
-        let inventory = []
-
-        for (let line of lines) {
-            if (!line.length) continue
+        let lines=text.trim().split("\n")
+        let inventory=[]
+        for (let line of lines){
+            if(!line.length) continue
             let p=line.split(":")
-            if (p.length<4) continue
-            let dev=p[0], type=p[1], state=p[2], conn=p[3]
-            let connected=(state==="connected")
-            inventory.push({
-                name:dev,
-                type:type,
-                connected:connected,
-                connection:conn
-            })
-
-
-            if(type==="wifi" && connected){
-                if(wifiInterface==="") wifiInterface=dev
-                connectionType="WiFi"
-                ssid=conn
-            } else if(type==="ethernet" && connected){
-                if(ethernetInterface==="") ethernetInterface=dev
-                connectionType="Ethernet"
+            if(p.length<4) continue
+            let iface=createInterface({name:p[0],type:p[1],connected:p[2]==="connected",connection:p[3]})
+            inventory.push(iface)
+            if(iface.connected){
+                if(iface.type==="wifi"){ if(wifiInterface==="") wifiInterface=iface.name; connectionType="WiFi"}
+                else if(iface.type==="ethernet"){ connectionType="Ethernet"}
+                metadataQueue.push({generation:metadataGeneration,type:iface.type,iface:iface})
             }
         }
-
-        interfaceInventory = inventory
-        if (connectionType === "WiFi") {
-            wifiProcess.command=["sh","-c","iw dev "+wifiInterface+" link; nmcli -g IP4.ADDRESS device show "+wifiInterface]
-            wifiProcess.running=true
-        } else if (connectionType==="Ethernet") {
-            ethernetProcess.command=["sh","-c","cat /sys/class/net/"+ethernetInterface+"/speed 2>/dev/null; nmcli -g IP4.ADDRESS device show "+ethernetInterface]
-            ethernetProcess.running=true
-        } else {
-
-            ssid = "--"
-            signal = 0
-            ip = "--"
-            ethernetSpeed = "--"
-
-            rebuildInterfaces()
-
-        } 
+        interfaceInventory=inventory
+        if(metadataQueue.length===0) rebuildInterfaces()
+        else runNextMetadataJob()
     }
 
-    function parseWifiData(text) {
+function parseWifiData(text) {
 
     let data = {
         ssid: ssid,
         signal: 0,
         ip: "--"
     }
+
+    if (!text || text.trim() === "")
+        return data
 
     let lines = text.trim().split("\n")
 
@@ -165,7 +141,9 @@ function rebuildInterfaces() {
 
         if (line.startsWith("SSID:")) {
 
-            data.ssid = line.substring(5).trim()
+            let value = line.substring(5).trim()
+            if (value !== "" && value !== "--")
+                data.ssid = value
 
         }
 
@@ -177,13 +155,15 @@ function rebuildInterfaces() {
 
                 let dbm = parseInt(match[1])
 
-                data.signal = Math.max(
-                    0,
-                    Math.min(
-                        100,
-                        2 * (dbm + 100)
+                if (!isNaN(dbm)) {
+                    data.signal = Math.max(
+                        0,
+                        Math.min(
+                            100,
+                            2 * (dbm + 100)
+                        )
                     )
-                )
+                }
 
             }
 
@@ -191,7 +171,8 @@ function rebuildInterfaces() {
 
         else if (line.indexOf("/") !== -1) {
 
-            data.ip = line
+            if (line !== "")
+                data.ip = line
 
         }
 
@@ -201,31 +182,41 @@ function rebuildInterfaces() {
 }
 
 function parseWifi(text) {
-
-    let data = parseWifiData(text)
-
-    ssid = data.ssid
-    signal = data.signal
-    ip = data.ip
-
-    rebuildInterfaces()
-
+    if(!activeMetadataJob||activeMetadataJob.generation!==metadataGeneration) return
+    let d=parseWifiData(text)
+    if(d.ssid!==""&&d.ssid!=="--") activeMetadataJob.iface.ssid=d.ssid
+    activeMetadataJob.iface.signal=d.signal
+    if(d.ip!=="--") activeMetadataJob.iface.ip=d.ip
+    else if(!activeMetadataJob.iface.ip) activeMetadataJob.iface.ip=d.ip
+    runNextMetadataJob()
 }
 
 function parseEthernetData(text) {
+        let data={speed:"--",ip:"--"}
+        if(!text||text.trim()==="") return data
         let lines=text.trim().split("\n")
-        return {speed:(lines.length>0&&lines[0]!==""?lines[0]+" Mbps":"--"), ip:(lines.length>1&&lines[1]!==""?lines[1]:"--")}
+        if(lines.length>0){
+            let s=lines[0].trim()
+            if(s!==""&&s!=="Unknown"&&s!=="-1"){
+                let n=parseInt(s)
+                if(!isNaN(n)&&n>=0) data.speed=n+" Mbps"
+            }
+        }
+        if(lines.length>1){
+            let ip=lines[1].trim()
+            if(ip!==""&&ip!=="Unknown"&&ip!=="-1") data.ip=ip
+        }
+        return data
     }
 
 function parseEthernet(text) {
-
-    let data = parseEthernetData(text)
-
-    ethernetSpeed = data.speed
-    ip = data.ip
-
-    rebuildInterfaces()
-
+    if(!activeMetadataJob||activeMetadataJob.generation!==metadataGeneration) return
+    let d=parseEthernetData(text)
+    if(d.speed!=="--") activeMetadataJob.iface.speed=d.speed
+    else if(!activeMetadataJob.iface.speed) activeMetadataJob.iface.speed=d.speed
+    if(d.ip!=="--") activeMetadataJob.iface.ip=d.ip
+    else if(!activeMetadataJob.iface.ip) activeMetadataJob.iface.ip=d.ip
+    runNextMetadataJob()
 }
 
     function parseScan(text) {
