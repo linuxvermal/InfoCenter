@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls
 
 import "../theme"
 import "../components"
@@ -23,356 +24,345 @@ Column {
     readonly property var wifi:
     activeWifi.length > 0 ? activeWifi[0] : null
 
-    readonly property var ethernet:
-    activeEthernet.length > 0 ? activeEthernet[0] : null
-
     SectionTitle {
 
         title: "NETWORK (" + root.activeCount + ")"
 
     }
 
-    //
-    // WiFi
-    //
+    Item {
 
-    Column {
+    visible: !root.showNetworks
 
-        visible: root.activeWifi.length > 0 && !root.showNetworks
+    width: parent.width
 
-        width: parent.width
+    height: Math.min(contentColumn.implicitHeight, 180)
 
-        spacing: 6
+    ScrollView {
 
+        anchors.fill: parent
 
-        GridLayout {
+        clip: true
 
-            id: wifiGrid
+        Column {
+
+            id: contentColumn
 
             width: parent.width
 
-            columns: 4
+                //
+                // WiFi
+                //
 
-            columnSpacing: 8
+                Column {
 
-            rowSpacing: 6
+                    visible: root.activeWifi.length > 0 && !root.showNetworks
 
-            property int labelWidth: 52
-            property int valueWidth: 150
+                    width: parent.width
 
-
-            Text {
-
-                Layout.preferredWidth: wifiGrid.labelWidth
-
-                text: "SSID"
-
-                color: Theme.text
-
-                font.family: Theme.font
-
-                font.pixelSize: Theme.normalSize
-
-                Layout.row: 0
-                Layout.column: 0
-
-            }
+                    spacing: 6
 
 
-            Text {
+                    GridLayout {
 
-                Layout.preferredWidth: wifiGrid.valueWidth
+                        id: wifiGrid
 
-                text: wifi ? wifi.ssid : "--"
+                        width: parent.width
 
-                color: Theme.noncritical
+                        columns: 4
 
-                font.family: Theme.font
+                        columnSpacing: 8
 
-                font.pixelSize: Theme.normalSize
+                        rowSpacing: 6
 
-                elide: Text.ElideRight
-
-                Layout.row: 0
-                Layout.column: 1
-
-            }
+                        property int labelWidth: 52
+                        property int valueWidth: 150
 
 
-            Text {
+                        Text {
 
-                Layout.preferredWidth: wifiGrid.labelWidth
+                            Layout.preferredWidth: wifiGrid.labelWidth
 
-                text: "SIGNAL"
+                            text: "SSID"
 
-                color: Theme.text
+                            color: Theme.text
 
-                font.family: Theme.font
+                            font.family: Theme.font
 
-                font.pixelSize: Theme.normalSize
+                            font.pixelSize: Theme.normalSize
 
-                Layout.row: 1
-                Layout.column: 0
+                            Layout.row: 0
+                            Layout.column: 0
 
-            }
-
-
-            Text {
-
-                Layout.preferredWidth: wifiGrid.valueWidth
-
-                text: wifi ? wifi.signal + "%" : "--"
-
-                color: Theme.text
-
-                font.family: Theme.font
-
-                font.pixelSize: Theme.normalSize
-
-                Layout.row: 1
-                Layout.column: 1
-
-            }
+                        }
 
 
-            Text {
+                        Text {
 
-                Layout.preferredWidth: wifiGrid.labelWidth
+                            Layout.preferredWidth: wifiGrid.valueWidth
 
-                text: "IP"
+                            text: wifi ? wifi.ssid : "--"
 
-                color: Theme.text
+                            color: Theme.noncritical
 
-                font.family: Theme.font
+                            font.family: Theme.font
 
-                font.pixelSize: Theme.normalSize
+                            font.pixelSize: Theme.normalSize
 
-                Layout.row: 2
-                Layout.column: 0
+                            elide: Text.ElideRight
 
-            }
+                            Layout.row: 0
+                            Layout.column: 1
+
+                        }
 
 
-            Text {
+                        Text {
 
-                Layout.preferredWidth: wifiGrid.valueWidth
+                            Layout.preferredWidth: wifiGrid.labelWidth
 
-                text: wifi ? wifi.ip : "--"
+                            text: "SIGNAL"
 
-                color: Theme.text
+                            color: Theme.text
 
-                font.family: Theme.font
+                            font.family: Theme.font
 
-                font.pixelSize: Theme.normalSize
+                            font.pixelSize: Theme.normalSize
 
-                elide: Text.ElideMiddle
+                            Layout.row: 1
+                            Layout.column: 0
 
-                Layout.row: 2
-                Layout.column: 1
+                        }
 
-            }
+
+                        Text {
+
+                            Layout.preferredWidth: wifiGrid.valueWidth
+
+                            text: wifi ? wifi.signal + "%" : "--"
+
+                            color: Theme.text
+
+                            font.family: Theme.font
+
+                            font.pixelSize: Theme.normalSize
+
+                            Layout.row: 1
+                            Layout.column: 1
+
+                        }
+
+
+                        Text {
+
+                            Layout.preferredWidth: wifiGrid.labelWidth
+
+                            text: "IP"
+
+                            color: Theme.text
+
+                            font.family: Theme.font
+
+                            font.pixelSize: Theme.normalSize
+
+                            Layout.row: 2
+                            Layout.column: 0
+
+                        }
+
+
+                        Text {
+
+                            Layout.preferredWidth: wifiGrid.valueWidth
+
+                            text: wifi ? wifi.ip : "--"
+
+                            color: Theme.text
+
+                            font.family: Theme.font
+
+                            font.pixelSize: Theme.normalSize
+
+                            elide: Text.ElideMiddle
+
+                            Layout.row: 2
+                            Layout.column: 1
+
+                        }
             
-            Item {
+                        Item {
 
-                Layout.row: 0
-                Layout.column: 2
+                            Layout.row: 0
+                            Layout.column: 2
 
-                Layout.fillWidth: true
+                            Layout.fillWidth: true
 
-            }
+                        }
 
         
-            Text {
+                        Text {
 
-                Layout.row: 0
-                Layout.column: 3
+                            Layout.row: 0
+                            Layout.column: 3
 
-                text: "WiFi (1)"
+                            text: "WiFi (1)"
 
-                color: Theme.warning
+                            color: Theme.warning
 
-                font.family: Theme.font
-                font.pixelSize: Theme.normalSize
+                            font.family: Theme.font
+                            font.pixelSize: Theme.normalSize
 
-                Layout.alignment: Qt.AlignRight
+                            Layout.alignment: Qt.AlignRight
 
-            }
+                        }
+
+              }
+
+
+                    Item {
+
+                        height: 2
+
+                    }
+
+
+                    Row {
+
+                        width: parent.width
+
+
+                        Item {
+
+                            width: (parent.width - scanButton.width) / 2
+
+                            height: 1
+
+                        }
+
+
+                    ActionButton {
+
+                           id: scanButton
+
+                           text: "SCAN"
+
+                           onClicked: {
+
+                             root.showNetworks = true
+
+                             NetworkProvider.scan()
+
+                           }
+
+                    }
+
+                  }
+
+                }
+
+
+
+                //
+                // Ethernet
+                //
+
+                Column {
+
+                    width: parent.width
+
+                Item {
+
+                    visible: root.activeEthernet.length > 0
+
+                    width: parent.width
+
+                    height: 16
+
+                }    
+
+                Repeater {
+
+                    model: activeEthernet
+
+                    delegate: Column {
+
+                        width: parent.width
+
+                        spacing: 0
+
+
+                        GridLayout {
+
+                            id: ethernetGrid
+
+                            width: parent.width
+
+                            columns: 4
+
+                            columnSpacing: 8
+
+                            rowSpacing: 6
+
+                            property int labelWidth: 52
+                            property int valueWidth: 150
+
+                            Text { Layout.preferredWidth: ethernetGrid.labelWidth; text: "NAME"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row: 0; Layout.column: 0 }
+                            Text { Layout.preferredWidth: ethernetGrid.valueWidth; text: modelData.name; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; elide: Text.ElideRight; Layout.row:0; Layout.column:1 }
+
+                            Text { Layout.preferredWidth: ethernetGrid.labelWidth; text: "SPEED"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row:1; Layout.column:0 }
+                            Text { Layout.preferredWidth: ethernetGrid.valueWidth; text: modelData.speed; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row:1; Layout.column:1 }
+
+                            Text { Layout.preferredWidth: ethernetGrid.labelWidth; text: "IP"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row:2; Layout.column:0 }
+                            Text { Layout.preferredWidth: ethernetGrid.valueWidth; text: modelData.ip; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row:2; Layout.column:1 }
+
+                            Item { Layout.row:0; Layout.column:2; Layout.fillWidth:true }
+                            Text { visible:index===0; Layout.row:0; Layout.column:3; text:"Ethernet ("+root.activeEthernet.length+")"; color:Theme.warning; font.family:Theme.font; font.pixelSize:Theme.normalSize; Layout.alignment:Qt.AlignRight }
+                        }
+
+
+                    Item {
+
+                            visible: index < root.activeEthernet.length - 1
+
+                            width: parent.width
+
+                            height: 4
+
+                        }
+
+                    Rectangle {
+
+                            visible: index < root.activeEthernet.length - 1
+
+                            width: parent.width
+
+                            height: 1
+
+                            color: Theme.separator
+
+                        }
+
+                    Item {
+
+                           visible: index < root.activeEthernet.length - 1
+
+                           width: parent.width
+
+                           height: 4
+
+                        }
+
+                    }
+
+                }
+
+        }
+
+    }
 
   }
 
-
-        Item {
-
-            height: 2
-
-        }
-
-
-        Row {
-
-            width: parent.width
-
-
-            Item {
-
-                width: (parent.width - scanButton.width) / 2
-
-                height: 1
-
-            }
-
-
-        ActionButton {
-
-               id: scanButton
-
-               text: "SCAN"
-
-               onClicked: {
-
-                 root.showNetworks = true
-
-                 NetworkProvider.scan()
-
-               }
-        }
-
-      }
-
-    }
-
-
-    //
-    // Ethernet
-    //
-
-    Column {
-
-        visible: root.activeEthernet.length > 0 && !root.showNetworks
-
-        width: parent.width
-
-        spacing: 6
-
-
-        GridLayout {
-
-            id: ethernetGrid
-
-            width: parent.width
-
-            columns: 4
-
-            columnSpacing: 8
-
-            rowSpacing: 6
-
-            property int labelWidth: 52
-            property int valueWidth: 150
-
-
-            Text {
-
-                Layout.preferredWidth: ethernetGrid.labelWidth
-
-                text: "SPEED"
-
-                color: Theme.text
-
-                font.family: Theme.font
-
-                font.pixelSize: Theme.normalSize
-
-                Layout.row: 0
-                Layout.column: 0
-
-            }
-
-
-            Text {
-
-                Layout.preferredWidth: ethernetGrid.valueWidth
-
-                text: ethernet ? ethernet.speed : "--"
-
-                color: Theme.text
-
-                font.family: Theme.font
-
-                font.pixelSize: Theme.normalSize
-
-                Layout.row: 0
-                Layout.column: 1
-
-            }
-
-
-            Text {
-
-                Layout.preferredWidth: ethernetGrid.labelWidth
-
-                text: "IP"
-
-                color: Theme.text
-
-                font.family: Theme.font
-
-                font.pixelSize: Theme.normalSize
-
-                Layout.row: 1
-                Layout.column: 0
-
-            }
-
-
-            Text {
-
-                Layout.preferredWidth: ethernetGrid.valueWidth
-
-                text: ethernet ? ethernet.ip : "--"
-
-                color: Theme.text
-
-                font.family: Theme.font
-
-                font.pixelSize: Theme.normalSize
-
-                elide: Text.ElideMiddle
-
-                Layout.row: 1
-                Layout.column: 1
-
-            }
-            
-            Item {
-
-                Layout.row: 0
-                Layout.column: 2
-
-                Layout.fillWidth: true
-
-            }
-
-            Text {
-
-                Layout.row: 0
-                Layout.column: 3
-
-                text: "Ethernet (" + root.activeEthernet.length + ")"
-
-                color: Theme.warning
-
-                font.family: Theme.font
-                font.pixelSize: Theme.normalSize
-
-                Layout.alignment: Qt.AlignRight
-
-            }
-
-        }
-
-    }
-
+}
 
     //
     // Offline
