@@ -307,7 +307,7 @@ Column {
                             property int valueWidth: 150
 
                             Text { Layout.preferredWidth: ethernetGrid.labelWidth; text: "NAME"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row: 0; Layout.column: 0 }
-                            Text { Layout.preferredWidth: ethernetGrid.valueWidth; text: modelData.name; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; elide: Text.ElideRight; Layout.row:0; Layout.column:1 }
+                            Text { Layout.preferredWidth: ethernetGrid.valueWidth; text: modelData.name; color: Theme.noncritical; font.family: Theme.font; font.pixelSize: Theme.normalSize; elide: Text.ElideRight; Layout.row:0; Layout.column:1 }
 
                             Text { Layout.preferredWidth: ethernetGrid.labelWidth; text: "SPEED"; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row:1; Layout.column:0 }
                             Text { Layout.preferredWidth: ethernetGrid.valueWidth; text: modelData.speed; color: Theme.text; font.family: Theme.font; font.pixelSize: Theme.normalSize; Layout.row:1; Layout.column:1 }
