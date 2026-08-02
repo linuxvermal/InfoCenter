@@ -165,6 +165,8 @@ Singleton {
 
     function removeNotification(id) {
 
+        PopupManager.dismiss(id)
+
         notifications = notifications.filter(function(item) {
 
             return item.id !== id
