@@ -146,3 +146,79 @@ notification in history.
 ## License
 
 Add your preferred license here.
+
+---
+
+
+
+## Recent Project Updates
+
+### Platform Support
+
+InfoCenter has been validated and actively developed on:
+
+- **Fedora 44**
+- **KDE Plasma 6.7**
+- Quickshell 0.3.x
+
+The project continues to target modern Linux desktop environments using Quickshell and Wayland compositors.
+
+### Current Module Layout
+
+```text
+InfoCenter/
+├── components/
+│   ├── ActionButton.qml
+│   ├── InfoRow.qml
+│   ├── SectionTitle.qml
+│   ├── StatMeter.qml
+│   └── VolumeMeter.qml
+├── modules/
+│   ├── Header.qml
+│   ├── ClockSection.qml
+│   ├── SystemSection.qml
+│   ├── BatterySection.qml
+│   ├── PowerProfileSection.qml
+│   ├── NetworkSection.qml
+│   ├── AudioSection.qml
+│   └── NotificationSection.qml
+├── providers/
+├── theme/
+└── shell.qml
+```
+
+### Recent Improvements
+
+- Improved modular architecture and separation of responsibilities.
+- Faster persistent InfoCenter startup using IPC show/hide.
+- Redesigned SectionTitle component for improved consistency.
+- Improved InfoRow alignment and spacing.
+- Replaced the previous volume slider with a **VolumeMeter** for smoother volume feedback.
+- Updated power profile controls using ActionButton components.
+- Improved notification history, duplicate grouping, popup queueing, and PEACE Mode.
+- Improved network information handling.
+- Refined battery and system status presentation.
+- Consistent monospace styling throughout the interface.
+- Cleaner block-character system meters for CPU, RAM, Disk, Battery, and Audio.
+
+### Directory Design Principles
+
+- Components provide reusable UI elements.
+- Modules present complete functional sections.
+- Providers own data acquisition and state.
+- UI remains presentation-focused.
+- Each component has a single responsibility.
+
+### Roadmap
+
+Planned future enhancements include:
+
+- Fan monitoring
+- CPU frequency monitoring
+- Disk SMART health
+- Additional hardware sensors
+- Better GPU monitoring
+- Enhanced network diagnostics
+- More configurable themes
+- Improved Fedora and KDE Plasma validation
+- Expanded documentation and developer guides

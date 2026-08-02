@@ -38,6 +38,9 @@ Rectangle {
     readonly property int count:
         notification?.count ?? 1
 
+    readonly property bool dismissible:
+        notification?.dismissible ?? true
+
     readonly property color urgencyColor: {
 
         switch (urgency) {
@@ -163,7 +166,9 @@ Rectangle {
 
             Text {
 
-                text: "×"
+    visible: dismissible
+
+    text: "×"
 
                 color: Theme.muted
 
