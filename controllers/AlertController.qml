@@ -78,13 +78,6 @@ QtObject {
 
         var severity = currentSeverity()
 
-        console.log(
-            "[AlertController] severity =",
-            severity,
-            "lastSeverity =",
-            lastSeverity
-        )
-
         if (severity === lastSeverity) {
         
             return
