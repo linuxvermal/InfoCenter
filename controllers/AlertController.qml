@@ -9,16 +9,10 @@ QtObject {
     id: root
 
     //
-    // Tracks whether the initial warning
-    // notification has already been shown.
+    // Tracks the highest battery alert
+    // severity that has been issued.
     //
-    property bool warningShown: false
-
-    //
-    // Tracks the last battery percentage where
-    // a repeat critical notification occurred.
-    //
-    property int lastCriticalRepeat: -1
+    property int lastSeverity: 0
 
     //
     // Listen for battery changes.
@@ -37,63 +31,116 @@ QtObject {
     }
 
     //
-    // Evaluate battery state against the
-    // alert policy.
+    // Determine the current battery alert
+    // severity from the current battery state.
+    //
+    // Returns:
+    //   0 = Normal / Charging
+    //   1 = Warning   (<= 30%)
+    //   2 = Critical  (<= 10%)
+    //   3 = Emergency (<= 4%)
+    //
+    function currentSeverity() {
+
+        if (BatteryProvider.state === "Charging") {
+
+            return 0
+
+        }
+
+        if (BatteryProvider.percent <= 4) {
+
+            return 3
+
+        }
+
+        if (BatteryProvider.percent <= 10) {
+
+            return 2
+
+        }
+
+        if (BatteryProvider.percent <= 30) {
+
+            return 1
+
+        }
+
+            return 0
+
+        }
+
+    //
+    // Evaluate the current battery alert
+    // severity and apply the alert policy.
     //
     function evaluate() {
 
+        var severity = currentSeverity()
+
         console.log(
-    "[AlertController]",
-    BatteryProvider.percent,
-    BatteryProvider.state
-)
+            "[AlertController] severity =",
+            severity,
+            "lastSeverity =",
+            lastSeverity
+        )
+
+        if (severity === lastSeverity) {
+        
+            return
+        
+        }
 
         //
-        // Charging
+        // Normal / Charging
         //
-        if (BatteryProvider.state === "Charging") {
+        if (severity === 0) {
 
             AlertManager.removeAlert()
 
-            warningShown = false
-            lastCriticalRepeat = -1
+            lastSeverity = 0
 
             return
+
         }
 
         //
-        // 30%
+        // Warning
         //
-        if (!warningShown &&
-            BatteryProvider.percent <= 30 &&
-            BatteryProvider.percent > 10) {
+        if (severity === 1) {
 
             AlertManager.showWarning()
 
-            warningShown = true
+            lastSeverity = 1
 
             return
+
         }
 
         //
-        // 10%
+        // Critical
         //
-        if (BatteryProvider.percent <= 10 &&
-            BatteryProvider.percent >= 5) {
+        if (severity === 2) {
 
             AlertManager.showCritical()
 
+            lastSeverity = 2
+
             return
+
         }
 
         //
-        // 4%
+        // Emergency
         //
-        if (BatteryProvider.percent <= 4) {
+        if (severity === 3) {
 
             AlertManager.showEmergency()
 
+            lastSeverity = 3
+
             return
+
         }
     }
 }

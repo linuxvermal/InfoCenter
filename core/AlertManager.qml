@@ -56,10 +56,4 @@ QtObject {
         dismissed = false
     }
 
-    function dismissAlert() {
-
-        dismissed = true
-        NotificationProvider.removeNotification("battery")
-    }
-
 }
