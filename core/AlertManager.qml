@@ -18,6 +18,7 @@ QtObject {
             summary: "Battery Low",
             body: "Battery is getting low.\nConnect AC power soon.",
             urgency: "warning",
+            requiresAcknowledgement: true,
             timestamp: Date.now()
         })
     }
@@ -30,6 +31,7 @@ QtObject {
             summary: "Battery Critical",
             body: "Save your work.\nConnect AC power now.",
             urgency: "critical",
+            requiresAcknowledgement: true,
             timestamp: Date.now()
         })
     }
@@ -43,6 +45,7 @@ QtObject {
             body: "Save your work immediately.\nConnect AC power now.",
             urgency: "critical",
             timestamp: Date.now(),
+            requiresAcknowledgement: true,
             dismissible: false
         })
     }

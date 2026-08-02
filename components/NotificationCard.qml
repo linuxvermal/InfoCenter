@@ -8,6 +8,8 @@ Rectangle {
 
     id: root
 
+    signal dismissRequested(string id)
+
     property bool popupMode: false
 
     //----------------------------------------------------------------------
@@ -183,10 +185,8 @@ Rectangle {
                     anchors.fill: parent
 
                     onClicked: {
-
-                        NotificationProvider.removeNotification(
-                            notification.id
-                        )
+                        
+                        dismissRequested(notification.id)
 
                     }
 

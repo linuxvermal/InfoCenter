@@ -104,6 +104,9 @@ Singleton {
 
         const existing = updated.find(function(item) {
 
+        if (notification.id)
+            return item.id === notification.id
+
             return notificationKey(item) === key
 
         })
@@ -120,10 +123,16 @@ Singleton {
                 // recognizes this as an update instead of a new popup.
                 id: existing.id,
 
-                appName: existing.appName,
-                summary: existing.summary,
-                body: existing.body,
-                urgency: existing.urgency,
+                appName: notification.appName,
+                summary: notification.summary,
+                body: notification.body,
+                urgency: notification.urgency,
+
+                //
+                // Preserve alert behaviour.
+                //
+                requiresAcknowledgement:
+                    notification.requiresAcknowledgement === true,
 
                 timestamp: notification.timestamp,
 
@@ -163,6 +172,13 @@ Singleton {
         })
 
     }
+
+    function hidePopup(id) {
+
+        PopupManager.dismiss(id)
+
+    }
+
 
     function clear() {
 

@@ -81,6 +81,12 @@ Column {
 
                     notification: modelData
 
+                    onDismissRequested: function(id) {
+
+                        NotificationProvider.removeNotification(id)
+
+                    }
+
                 }
 
             }

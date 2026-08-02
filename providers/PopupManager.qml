@@ -122,10 +122,21 @@ Singleton {
 
     function refresh() {
 
-        const now = Date.now()
+         const now = Date.now()
 
-        activeNotifications.forEach(function(popup) {
+         activeNotifications.forEach(function(popup) {
 
+    //
+    // Alerts that require acknowledgement
+    // remain visible until dismissed.
+    //
+            if (popup.notification.requiresAcknowledgement)
+                return
+
+    //
+    // Standard notifications automatically
+    // disappear after five seconds.
+    //
             if ((now - popup.shownAt) >= 5000) {
 
                 dismiss(popup.notification.id)

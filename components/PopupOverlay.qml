@@ -68,6 +68,12 @@ Scope {
 
                         notification: modelData.notification
 
+                        onDismissRequested: function(id) {
+
+                            NotificationProvider.hidePopup(id)
+
+                        }
+
                     }
 
                 }
