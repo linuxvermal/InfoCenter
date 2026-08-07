@@ -6,6 +6,8 @@
 
 ------------------------------------------------------------------------
 
+<img width="1920" height="1200" alt="image" src="https://github.com/user-attachments/assets/fbb6a857-5440-417b-b4da-0db30e8cec69" />
+
 ## Overview
 
 InfoCenter is a persistent Quickshell application that provides system
