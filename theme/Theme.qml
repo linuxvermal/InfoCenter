@@ -24,7 +24,7 @@ QtObject {
         "#a89984"
 
     property color accent:
-        "#89b4c2"
+        "#98afc7"
 
     property color bar:
         "#e8e6d9"
@@ -79,6 +79,9 @@ QtObject {
 
     property int smallSize:
         10
+
+    property int weatherConditionSize: 
+        14
 
     //
     // Spacing

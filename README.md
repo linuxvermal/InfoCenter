@@ -49,6 +49,9 @@ InfoCenter.qml
 Modules
     │
     ▼
+Controllers
+    │
+    ▼
 Providers
     │
     ▼
@@ -147,9 +150,7 @@ notification in history.
 
 Add your preferred license here.
 
----
-
-
+------------------------------------------------------------------------
 
 ## Recent Project Updates
 
@@ -157,68 +158,120 @@ Add your preferred license here.
 
 InfoCenter has been validated and actively developed on:
 
-- **Fedora 44**
-- **KDE Plasma 6.7**
-- Quickshell 0.3.x
+-   **Fedora 44**
+-   **KDE Plasma 6.7**
+-   Quickshell 0.3.x
 
-The project continues to target modern Linux desktop environments using Quickshell and Wayland compositors.
+The project continues to target modern Linux desktop environments using
+Quickshell and Wayland compositors.
 
 ### Current Module Layout
 
-```text
+``` text
 InfoCenter/
-├── components/
-│   ├── ActionButton.qml
-│   ├── InfoRow.qml
-│   ├── SectionTitle.qml
-│   ├── StatMeter.qml
-│   └── VolumeMeter.qml
-├── modules/
-│   ├── Header.qml
-│   ├── ClockSection.qml
-│   ├── SystemSection.qml
-│   ├── BatterySection.qml
-│   ├── PowerProfileSection.qml
-│   ├── NetworkSection.qml
-│   ├── AudioSection.qml
-│   └── NotificationSection.qml
-├── providers/
-├── theme/
-└── shell.qml
+├── components
+│   ├── ActionButton.qml
+│   ├── Divider.qml
+│   ├── DualInfoRow.qml
+│   ├── FocusRegion.qml
+│   ├── Header.qml
+│   ├── InfoRow.qml
+│   ├── MiniStatMeter.qml
+│   ├── NotificationCard.qml
+│   ├── PasswordInput.qml
+│   ├── PopupOverlay.qml
+│   ├── qmldir
+│   ├── SectionTitle.qml
+│   ├── StatMeter.qml
+│   ├── StatusBadge.qml
+│   ├── TemperatureRow.qml
+│   └── WifiNetworkRow.qml
+├── controllers
+│   ├── AlertController.qml
+│   └── qmldir
+├── core
+│   ├── AlertManager.qml
+│   ├── HardwarePaths.qml
+│   ├── NotificationServer.qml
+│   ├── qmldir
+│   └── SystemPaths.qml
+├── docs
+│   ├── DEVELOPMENT_GUIDE.md
+│   └── InfoCenter_Notification_Architecture.md
+├── framework
+│   ├── Debugger.qml
+│   ├── KeyboardNavigation.qml
+│   └── qmldir
+├── InfoCenter.qml
+├── modules
+│   ├── AudioSection.qml
+│   ├── BatterySection.qml
+│   ├── ModesSection.qml
+│   ├── NetworkConnectivity.qml
+│   ├── NetworkInterfaceCard.qml
+│   ├── NetworkSection.qml
+│   ├── NotificationSection.qml
+│   ├── qmldir
+│   └── SystemSection.qml
+├── providers
+│   ├── AudioProvider.qml
+│   ├── BatteryProvider.qml
+│   ├── ModesProvider.qml
+│   ├── NetworkProvider.qml
+│   ├── NotificationProvider.qml
+│   ├── PopupManager.qml
+│   ├── PowerProvider.qml
+│   ├── qmldir
+│   ├── SensorProvider.qml
+│   └── SystemProvider.qml
+├── README.md
+├── shell.qml
+└── theme
+    ├── qmldir
+    └── Theme.qml
 ```
 
 ### Recent Improvements
 
-- Improved modular architecture and separation of responsibilities.
-- Faster persistent InfoCenter startup using IPC show/hide.
-- Redesigned SectionTitle component for improved consistency.
-- Improved InfoRow alignment and spacing.
-- Replaced the previous volume slider with a **VolumeMeter** for smoother volume feedback.
-- Updated power profile controls using ActionButton components.
-- Improved notification history, duplicate grouping, popup queueing, and PEACE Mode.
-- Improved network information handling.
-- Refined battery and system status presentation.
-- Consistent monospace styling throughout the interface.
-- Cleaner block-character system meters for CPU, RAM, Disk, Battery, and Audio.
+-   Improved modular architecture and separation of responsibilities.
+-   Faster persistent InfoCenter startup using IPC show/hide.
+-   Redesigned SectionTitle component for improved consistency.
+-   Improved InfoRow alignment and spacing.
+-   Replaced the previous volume slider with a **VolumeMeter** for
+    smoother volume feedback.
+-   Updated power profile controls using ActionButton components.
+-   Improved notification history, duplicate grouping, popup queueing,
+    and PEACE Mode.
+-   Improved network information handling.
+-   Refined battery and system status presentation.
+-   Consistent monospace styling throughout the interface.
+-   Cleaner block-character system meters for CPU, RAM, Disk, Battery,
+    and Audio.
 
 ### Directory Design Principles
 
-- Components provide reusable UI elements.
-- Modules present complete functional sections.
-- Providers own data acquisition and state.
-- UI remains presentation-focused.
-- Each component has a single responsibility.
+-   Components provide reusable UI elements.
+-   Modules present complete functional sections.
+-   Providers own data acquisition and state.
+-   UI remains presentation-focused.
+-   Each component has a single responsibility.
 
 ### Roadmap
 
 Planned future enhancements include:
 
-- Fan monitoring
-- CPU frequency monitoring
-- Disk SMART health
-- Additional hardware sensors
-- Better GPU monitoring
-- Enhanced network diagnostics
-- More configurable themes
-- Improved Fedora and KDE Plasma validation
-- Expanded documentation and developer guides
+-   Fan monitoring
+-   CPU frequency monitoring
+-   Disk SMART health
+-   Additional hardware sensors
+-   Better GPU monitoring
+-   Enhanced network diagnostics
+-   More configurable themes
+-   Improved Fedora and KDE Plasma validation
+-   Expanded documentation and developer guides
+
+## 2026 Architecture Refactor
+
+See `docs/InfoCenter_Notification_Architecture.md` for the complete
+notification and battery alert architecture introduced during the 2026
+refactor.

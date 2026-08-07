@@ -4,10 +4,17 @@ import QtQml
 import Quickshell
 
 import "../theme"
+import "../providers"
 
 Item {
 
     id: root
+
+    WeatherProvider {
+
+    id: weather
+
+    }
 
     SystemClock {
 
@@ -18,7 +25,7 @@ Item {
     }
 
     implicitWidth: parent ? parent.width : Theme.panelWidth
-    implicitHeight: 38
+    implicitHeight: 56
 
     property string currentTime: ""
     property string currentDate: ""
@@ -82,27 +89,91 @@ Item {
 
         }
 
+         //
+        // WEATHER + DATE
         //
-        // DATE
-        //
 
-        Text {
+        ColumnLayout {
 
-            text: root.currentDate
-
-            color: Theme.warning
-
-            font.family: Theme.font
-
-            font.pixelSize: Theme.headerDateSize
-
-            horizontalAlignment: Text.AlignRight
-
-            verticalAlignment: Text.AlignTop
+            spacing: 2
 
             Layout.alignment: Qt.AlignTop | Qt.AlignRight
 
+            RowLayout {
+
+            spacing: 6
+
+            Layout.alignment: Qt.AlignRight
+
+            Text {
+
+                text: weather.icon
+
+                color: Theme.text
+
+                font.family: "Noto Color Emoji"
+
+                font.pixelSize: 26
+
+                horizontalAlignment: Text.AlignRight
+
+                Layout.alignment: Qt.AlignVCenter
+
+            }
+
+            Text {
+
+                text: weather.temperatureText
+
+                color: Theme.text
+
+                font.family: Theme.font
+
+                font.pixelSize: Theme.headerDateSize
+
+                font.bold: true
+
+                horizontalAlignment: Text.AlignRight
+
+                Layout.alignment: Qt.AlignVCenter
+
         }
+
+    }
+
+    Text {
+
+       text: weather.condition
+
+       color: Theme.muted
+
+       font.family: Theme.font
+
+       font.pixelSize: Theme.weatherConditionSize
+
+       horizontalAlignment: Text.AlignRight
+
+       Layout.alignment: Qt.AlignRight
+
+       }
+
+    Text {
+
+       text: root.currentDate
+
+       color: Theme.warning
+
+       font.family: Theme.font
+
+       font.pixelSize: Theme.headerDateSize
+
+       horizontalAlignment: Text.AlignRight
+
+       Layout.alignment: Qt.AlignRight
+
+       }
+
+       }
 
     }
 
